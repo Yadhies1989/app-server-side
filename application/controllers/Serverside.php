@@ -42,4 +42,22 @@ class Serverside extends CI_Controller
 
         $this->output->set_content_type('application/json')->set_output(json_encode($output));
     }
+
+    public function add()
+    {
+        $data = [
+            'nama_depan' => htmlspecialchars($this->input->post('nama_depan')),
+            'nama_belakang' => htmlspecialchars($this->input->post('nama_belakang')),
+            'alamat' => htmlspecialchars($this->input->post('alamat')),
+            'no_hp' => htmlspecialchars($this->input->post('no_hp'))
+        ];
+
+        if ($this->Serverside_model->created($data) > 0) {
+            $message['status'] = 'success';
+        } else {
+            $message['status'] = 'failed';
+        }
+
+        $this->output->set_content_type('application/json')->set_output(json_encode($message));
+    }
 }
