@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <div class="container mt-5 mb-5">
+    <div class="container-fluid mt-5 mb-5">
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-primary" onclick="add()">
             Tambah Data
@@ -35,21 +35,30 @@
                     </div>
                     <div class="modal-body form">
                         <form action="#" id="formData">
+                            <input type="hidden" id="id" name="id" value="">
                             <div class="form-group">
                                 <label for="namaDepan">Nama Depan:</label>
                                 <input type="text" class="form-control" id="namaDepan" name="nama_depan" placeholder="Nama Depan ...">
+                                <div class="invalid-feedback">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="namaBelakang">Nama Belakang:</label>
                                 <input type="text" class="form-control" id="namaBelakang" name="nama_belakang" placeholder="Nama Belakang ...">
+                                <div class="invalid-feedback">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="alamat">Alamat:</label>
-                                <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Nama Belakang ...">
+                                <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Alamat ...">
+                                <div class="invalid-feedback">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="nomorHandphone">Nomor Handphone:</label>
-                                <input type="text" class="form-control" id="nomorHandphone" name="no_hp" placeholder="Nama Belakang ...">
+                                <input type="text" class="form-control" id="nomorHandphone" name="no_hp" placeholder="No Handphone ...">
+                                <div class="invalid-feedback">
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -70,6 +79,7 @@
                             <th>Nama Belakang</th>
                             <th>Alamat</th>
                             <th>No HP</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,6 +92,7 @@
                             <th>Nama Belakang</th>
                             <th>Alamat</th>
                             <th>No HP</th>
+                            <th>Aksi</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -101,6 +112,7 @@
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
+        var saveData;
         const modal = $('#modalData');
         const tableData = $('#myTabel');
         const formData = $('#formData');
@@ -111,7 +123,7 @@
             tableData.DataTable({
                 "processing": true,
                 "serverSide": true,
-                "pageLength": 50,
+                "pageLength": 10,
                 "order": [],
                 "ajax": {
                     "url": "<?= base_url('serverside/getData'); ?>",
@@ -129,15 +141,23 @@
         }
 
         function add() {
+            saveData = 'tambah';
             formData[0].reset();
             modal.modal('show');
             modalTitle.text('Tambah Data');
+            btnSave.text('Simpan');
+
+            console.log(saveData);
         }
 
         function save() {
             btnSave.text('Mohon Tunggu ...');
             btnSave.attr('disabled', true);
-            url = "<?= base_url('serverside/add') ?>";
+            if (saveData == 'tambah') {
+                url = "<?= base_url('serverside/add') ?>";
+            } else {
+                url = "<?= base_url('serverside/update') ?>";
+            }
 
             $.ajax({
                 type: "POST",
@@ -148,10 +168,67 @@
                     if (response.status == 'success') {
                         modal.modal('hide');
                         reloadTable();
+                    } else {
+                        for (var i = 0; i < response.inputerror.length; i++) {
+                            $('[name="' + response.inputerror[i] + '"]').addClass('is-invalid');
+                            $('[name="' + response.inputerror[i] + '"]').next().text(response.error_string[i]);
+                        }
                     }
+                    if (saveData == 'tambah') {
+                        btnSave.text('Simpan Data');
+                        btnSave.attr('disabled', false);
+                    } else {
+                        btnSave.text('Ubah Data');
+                        btnSave.attr('disabled', false);
+                    }
+
                 },
                 error: function() {
                     console.log('error database');
+                }
+            });
+        }
+
+        function byid(id, type) {
+            if (type == 'edit') {
+                saveData = 'edit';
+                formData[0].reset();
+            }
+            $.ajax({
+                type: "GET",
+                url: "<?= base_url('serverside/byid/') ?>" + id,
+                dataType: "JSON",
+                success: function(response) {
+                    if (type == 'edit') {
+                        formData.find('input').removeClass('is-invalid');
+                        modalTitle.text('Edit Data');
+                        btnSave.text('Edit Data');
+                        btnSave.attr('disabled', false);
+                        formData[0].reset();
+                        $('[name="id"]').val(response.id);
+                        $('[name="nama_depan"]').val(response.nama_depan);
+                        $('[name="nama_belakang"]').val(response.nama_belakang);
+                        $('[name="alamat"]').val(response.alamat);
+                        $('[name="no_hp"]').val(response.no_hp);
+                        modal.modal('show');
+                    } else {
+                        var result = confirm('Apakah Akan Menghapus Data?' + response.nama_depan);
+                        if (result) {
+                            deleteData(response.id);
+                        }
+                    }
+                }
+            });
+        }
+
+        function deleteData(id) {
+            $.ajax({
+                type: "POST",
+                url: '<?= base_url('serverside/delete/') ?>' + id,
+                dataType: "JSON",
+                success: function(response) {
+                    // console.log(response);
+                    reloadTable();
                 }
             });
         }

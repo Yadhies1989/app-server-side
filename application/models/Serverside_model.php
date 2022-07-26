@@ -53,4 +53,21 @@ class Serverside_model extends CI_Model
         $this->db->insert('karyawan', $data);
         return $this->db->affected_rows();
     }
+
+    public function getdataById($id)
+    {
+        return $this->db->get_where($this->table, ['id' => $id])->row();
+    }
+
+    public function update($where, $data)
+    {
+        $this->db->update($this->table, $data, $where);
+        return $this->db->affected_rows();
+    }
+
+    public function delete($id)
+    {
+        $this->db->delete($this->table, ['id' => $id]);
+        return $this->db->affected_rows();
+    }
 }
