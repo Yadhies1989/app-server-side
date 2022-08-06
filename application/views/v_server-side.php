@@ -71,31 +71,34 @@
         </div>
         <div class="card mt-2">
             <div class="card-body">
-                <table id="myTabel" class="table table-striped table-bordered" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Depan</th>
-                            <th>Nama Belakang</th>
-                            <th>Alamat</th>
-                            <th>No HP</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="table-responsive">
+                    <table id="myTabel" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Depan</th>
+                                <th>Nama Belakang</th>
+                                <th>Alamat</th>
+                                <th>No HP</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Depan</th>
-                            <th>Nama Belakang</th>
-                            <th>Alamat</th>
-                            <th>No HP</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Depan</th>
+                                <th>Nama Belakang</th>
+                                <th>Alamat</th>
+                                <th>No HP</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
             </div>
         </div>
     </div>
@@ -110,6 +113,7 @@
 
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
+
 
     <script>
         var saveData;
@@ -227,7 +231,6 @@
                 url: '<?= base_url('serverside/delete/') ?>' + id,
                 dataType: "JSON",
                 success: function(response) {
-                    // console.log(response);
                     reloadTable();
                 }
             });
